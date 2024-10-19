@@ -27,25 +27,44 @@ const createContact = asyncHandler(async(req, res) => {
     res.status(201).json(contact);
 });
 
-//@desc Get New Contacts
+//@desc Get Contacts
 //@route GET /api/contacts/:id
 //@access public
 const getContact = asyncHandler(async (req, res) => {
-    res.status(201).json({message: `Create contact for ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    res.status(200).json(contact);
 });
 
-//@desc delete New Contacts
+// DELETE contact not working for some reason
+//@desc delete Contacts
 //@route DELETE /api/contacts/:id
 //@access public
-const deleteContact = asyncHandler(async(req, res) => {
-    res.status(201).json({message: `Deleted contact for ${req.params.id}`});
+const deleteContact = asyncHandler(async (req, res) => {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    await contact.remove(); // Call remove on the retrieved document
+    res.status(200).json({ message: "Contact deleted successfully" });
 });
 
-//@desc Update New Contacts
+
+//@desc Update Contacts
 //@route PUT /api/contacts/:id
 //@access public
 const updateContact = asyncHandler(async(req, res) => {
-    res.status(201).json({message: `Updated contact for ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    res.status(201).json(updatedContact);
 });
 
 module.exports = {getContact, getContacts, createContact, deleteContact, updateContact};
